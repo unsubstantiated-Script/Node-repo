@@ -1,20 +1,73 @@
-//-----------> Some setup notes...
+const chalk = require('chalk')
+const validator = require('validator')
+const {
+    argv
+} = require('yargs')
+const yargs = require('yargs')
+// const getNotes = require('./notes.js')
 
-// const fs = require('fs')
+//Customize yargs version
 
-// //First is name of the file, second is the data we wanna write 
-// //Will over write! 
-// fs.writeFileSync('notes.txt', 'Hey! Here is more!')
+yargs.version('1.1.0')
 
-// fs.appendFileSync('notes.txt', `\nHere is my added work complete!`)
+//add, remove, read, list
 
-//Importing file method need to assign  to a variable as the import gives a return value
-const add = require('./utils.js');
-const fart = require('./gassy.js');
+//CRUD with Yargs
+//Create add command 
+yargs.command({
+    command: 'add',
+    describe: 'Add a new note',
+    builder: {
+        title: {
+            //description 
+            describe: 'Note Title',
+            //required
+            demandOption: true,
+            //default needs to be set or you'll get bool
+            type: 'string'
+        },
+        body: {
+            //description 
+            describe: 'Note Body',
+            //required
+            demandOption: true,
+            //default needs to be set or you'll get bool
+            type: 'string'
+        }
+    },
+    handler: function (argv) {
+        console.log('Title: ' + argv.title);
+        console.log('Body: ' + argv.body);
+    }
+})
 
+//Remove command
+yargs.command({
+    command: 'remove',
+    describe: 'Remove a note',
+    handler: function () {
+        console.log('Removing a note!');
+    }
+})
 
-const result = fart('farting', 'bananas')
+yargs.command({
+    command: 'list',
+    describe: 'List notes',
+    handler: function () {
+        console.log('Listing the notes!');
+    }
+})
 
-console.log(result);
+yargs.command({
+    command: 'read',
+    describe: 'Read a note',
+    handler: function () {
+        // console.log('Reading a note!');
+        console.log('Title: ' + argv.title);
+    }
+})
 
-console.log(add(44, 55));
+// console.log(process.argv);
+// console.log(yargs.argv);
+//lets yargs console log its info
+yargs.parse()
