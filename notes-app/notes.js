@@ -3,21 +3,27 @@ const chalk = require('chalk')
 const {
     array
 } = require('yargs')
+const {
+    match
+} = require('assert')
 
-const getNotes = function () {
-    return 'Your Notes...'
-}
+const getNotes = () => 'Here is yer notes'
 
-
-const addNote = function (title, body) {
+//CRUD operations
+const addNote = (title, body) => {
     const notes = loadNotes()
 
     //Check if the array of JSON has a similar title to avoid overwriting
     //Non destructive
-    const duplicateNotes = notes.filter((note) => note.title === title)
+    //filter is a bit less efficient as it will search all the notes
+    // const duplicateNotes = notes.filter((note) => note.title === title)
+    //Find is more efficient because it will stop on the first note it finds...
+    const duplicateNote = notes.find(note => note.title === title)
 
     //If there is no duplicate, we can add the note 
-    if (duplicateNotes.length === 0) {
+    if (duplicateNote) {
+        console.log(chalk.bgRed('Note title taken'));
+    } else {
         //Adding the new info into the array so that the file keeps adding info on 
         notes.push({
             //Shorthand object construction 
@@ -26,14 +32,10 @@ const addNote = function (title, body) {
         })
         saveNotes(notes)
         console.log(chalk.green('New Note Added!'));
-    } else {
-        console.log(chalk.bgRed('Note title taken'));
     }
-
-
 }
 
-const removeNote = function (title) {
+const removeNote = (title) => {
 
     const notes = loadNotes();
     const newNotes = notes.filter((note) => note.title !== title);
@@ -44,19 +46,26 @@ const removeNote = function (title) {
         console.log(chalk.red(`Note \`${title}\` has been removed!`));
         saveNotes(newNotes);
     }
+}
 
+const readNote = (title) => {
 
+    const notes = loadNotes()
 
-};
-
-const saveNotes = function (notes) {
-    //Converts the data to JSON and writes to the file
-    const dataJSON = JSON.stringify(notes)
-    fs.writeFileSync('notes.json', dataJSON)
+    const note = notes.find(note => note.title === title)
+    if (note) {
+        console.log(chalk.bgMagenta(note.title));
+        console.log(note.body);
+    } else {
+        //Adding the new info into the array so that the file keeps adding info on 
+        console.log(chalk.bgRed('This note does not exist'));
+    }
 }
 
 
-const loadNotes = function () {
+
+//Utility functions 
+const loadNotes = () => {
     //This is error handling in case the JSON file doesn't exist. 
     try {
         //If this fails 
@@ -70,7 +79,20 @@ const loadNotes = function () {
 
 }
 
+const saveNotes = (notes) => {
+    //Converts the data to JSON and writes to the file
+    const dataJSON = JSON.stringify(notes)
+    fs.writeFileSync('notes.json', dataJSON)
+}
 
+
+const listNotes = () => {
+    console.log(chalk.bgBlue('Your Notes'));
+    const notes = loadNotes();
+    notes.forEach(note => console.log(note.title))
+    // const dataJSON = JSON.stringify(notes)
+    // fs.writeFileSync('notes.json', dataJSON)
+}
 
 
 //Single export 
@@ -80,5 +102,7 @@ const loadNotes = function () {
 module.exports = {
     getNotes,
     addNote,
-    removeNote
+    removeNote,
+    listNotes,
+    readNote
 }
