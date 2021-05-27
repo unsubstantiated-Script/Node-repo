@@ -1,10 +1,21 @@
 const path = require("path");
 const express = require("express");
+const hbs = require("hbs");
 
 const app = express();
-const publicDirectoryPath = path.join(__dirname, "../public");
 
-//Serving up the file directory
+//Defining paths for express config
+const publicDirectoryPath = path.join(__dirname, "../public");
+//Changing the hardcoded path to the views
+const viewsPath = path.join(__dirname, "../templates/views");
+const partialsPath = path.join(__dirname, "../templates/partials");
+
+//setting up the handlebars view engine and views location
+app.set("view engine", "hbs");
+app.set("views", viewsPath);
+hbs.registerPartials(partialsPath);
+
+//Serving up the static directory to serve
 app.use(express.static(publicDirectoryPath));
 
 //serving up html and json
@@ -12,8 +23,48 @@ app.use(express.static(publicDirectoryPath));
 // 	res.send("<h1>Yo diddly dawg!</h1>");
 // });
 
+//serving up a handlebar view passing data through the object below...
+app.get("", (req, res) => {
+	res.render("index", {
+		title: "Weather App",
+		name: "Justin Fulton",
+	});
+});
+
+app.get("/about", (req, res) => {
+	res.render("about", {
+		title: "About Me",
+		name: "Justin Fulton",
+	});
+});
+
+app.get("/help", (req, res) => {
+	res.render("help", {
+		title: "Help",
+		helpText: "Some text to help you",
+		name: "Justin Fulton",
+	});
+});
+
 app.get("/weather", (req, res) => {
 	res.send("This is the weather page!");
+});
+
+//The 404 page!
+app.get("/help/*", (req, res) => {
+	res.render("errPage", {
+		title: "404",
+		errText: "Help article not found!",
+		name: "Justin Fulton",
+	});
+});
+
+app.get("*", (req, res) => {
+	res.render("errPage", {
+		title: "404",
+		errText: "Page Not Found!",
+		name: "Justin Fulton",
+	});
 });
 
 app.listen(3000, () => {
